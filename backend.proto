@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package PlanProto;
+
+
+message BackendKafkaOffset
+{
+    // key
+    string topic = 1;
+    int32 partition = 2;
+    // value
+    int64 next_offset = 3;
+}
+
+
+message BackendKafkaRecord
+{
+    string path = 1;
+    string docid = 2; // changes at every load_str()
+    repeated BackendKafkaOffset next_offsets = 3;
+}

@@ -1,0 +1,149 @@
+syntax = "proto3";
+
+import "common.proto";
+import "update.proto";
+
+package PlanProto;
+
+
+message ReqNode {
+  string node_id = 1;
+}
+
+
+message ResNode {
+  string node_id = 4;
+  string parent_id = 5;
+  string name = 6;
+  NodeType type = 8;
+  repeated NodeConfigUpdate configs = 2;
+  repeated NodeStatusUpdate statuses = 3;
+  repeated string child_ids = 7;
+
+  // sheet specific returns
+  repeated CellUpdate cells = 11;
+  repeated BarrierUpdate barriers = 12;
+  repeated PropertyDefUpdate property_defs = 13;
+  repeated TwitUpdate twits = 14;
+  string redirect = 15; // in PAGE view, works like an HTTP redirect
+  Error redirect_error = 16; // to report e.g. redirect loops
+}
+
+
+message ReqVersion {
+  // protobufjs doesn't like empty structure
+  int32 unused = 1;
+}
+
+
+message ResVersion {
+  string git_hash = 1;
+}
+
+
+message ReqTree {
+  // protobufjs doesn't like empty structure
+  int32 unused = 1;
+}
+
+
+// This content is independent of the channel overlay
+message ResTreeNode
+{
+  string node_id = 4;
+  string parent_id = 5;
+  string name = 6;
+  repeated string child_ids = 7;
+  NodeType type = 8;
+}
+
+
+message ReqDocwide {
+  // protobufjs doesn't like empty structure
+  int32 unused = 1;
+}
+
+
+message ResDocwide {
+  repeated DocOptionUpdate options = 1;
+}
+
+
+message ResTree {
+  repeated ResTreeNode nodes = 1;
+}
+
+
+message ReqDocStr {
+  int32 unused = 1;
+  bool xml_with_ids = 2;
+}
+
+
+message ResDocStr {
+  string content = 2; // json format - axiom dump
+}
+
+
+message ReqHtmlRender {
+  string path = 1;
+  string subscription_user = 4;
+  map<string, string> params = 2;
+  bool debug = 3;
+
+  bool suppress_onclick_run = 20;
+}
+
+
+message ResHtmlRender {
+  int32 status_code = 2;
+  string html = 1;
+}
+
+
+message ReqValidateCode {
+  string code = 1;
+}
+
+
+enum FullTextSearchMode {
+  SEARCH_MODE_EXACT = 0;
+  SEARCH_MODE_FUZZY = 1;
+  SEARCH_MODE_REGULAR_EXPRESSION = 2;
+}
+
+
+message ReqFullTextSearch {
+  bool whole_doc = 6;
+  // if !whole_doc and sheet_id is '', search the currently subscribed sheet
+  string sheet_id = 1;
+  string needle = 2;
+  FullTextSearchMode mode = 3;
+  bool ignore_case = 4;
+  bool whole_cell = 5;
+}
+
+
+message SearchResult {
+  string sheet_id = 1;
+  int32 rv = 2;
+  int32 cv = 3;
+  string cell_value = 4;
+}
+
+
+message ResFullTextSearch {
+  // ranked from worst match to best, up to 20 returns
+  repeated SearchResult result = 1;
+}
+
+
+// the complete list of IKU keys and values and their dependencies,
+// in human readable text format. For debugging.
+message ReqStateDump {
+  int32 dummy = 1;
+}
+
+message ResStateDump {
+  string state = 1;
+}

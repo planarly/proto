@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+// import "common.proto"; // this is not used, and warning is generated, because of include
+
+package PlanProto;
+
+
+message LoginCloud {
+  string user = 1;
+  string jwt = 2;
+}
+
+message ReqFileCloud {
+  string user = 1;
+  string file = 2;
+}
+
+message SaveCloud {
+  string user = 1;
+  string file = 2;
+}
+
+message ListCloud {
+  string user = 1;
+}
+
+message UserCloud {
+  string name = 1;
+}
+
+message DeleteCloud {
+  string user = 1;
+  repeated string files = 2;
+}
+
+message ResSaveCloud {
+  bool success = 1;
+  string message = 2;
+}
+
+message FileCloud {
+  string key = 1;
+  string lastModified = 2;
+  string eTag = 3;
+  int32 size = 4;
+  string storageClass = 5;
+}
+
+message ResListCloud {
+  repeated FileCloud files = 1;
+}
+
+message ResDeleteCloud {
+  repeated string keys = 1;
+}
+
+message ReqPublicLink {
+  string filePath = 1;
+}
+
+message ResPublicLink {
+  string link = 1;
+}
+
+message ResUserCloud {
+  string name = 1;
+}

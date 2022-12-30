@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+import "query.proto";
+
+package PlanProto;
+
+// messages relating to channels and subscriptions
+
+
+enum NodeView {
+  NONE = 0;
+  EDITOR = 1;
+  PAGE = 2;
+}
+
+
+message Subscribe {
+  string user = 1;
+
+  // content of the SubscriptionSnapshot message
+  // if all false, no SubscriptionSnapshot is sent
+  bool snapshot_docwide = 10;
+  bool snapshot_tree = 11;
+  bool snapshot_node = 12;
+
+  // subscribe to the entire base document.
+  // This implies tree and docwide.
+  // This options is mainly used for unit tests.
+  bool full_base_doc = 2;
+
+  // currently this includes DocOption only
+  bool docwide = 8;
+
+  // subscribe to the tree structure messages
+  bool tree = 3;
+
+  // subscribe to updates for a single node
+  NodeView node_view = 4;
+  // if not supplied, subscribe to the default node, i.e. first child of `Root`
+  string node_id = 5;
+}
+
+
+message SubscriptionSnapshot
+{
+  ResDocwide docwide = 1;
+  ResTree tree = 2;
+  ResNode node = 3;
+}
+
+
+message KeepAlive {
+  int32 dummy = 1;
+}
+
+
+message AddChannel {
+  int32 dummy = 1;
+}
+
+
+message CloseChannel {
+  int32 dummy = 1;
+}
+
+
+message UnloadDoc {
+  int32 dummy = 1;
+}

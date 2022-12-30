@@ -1,0 +1,128 @@
+syntax = "proto3";
+
+import "common.proto";
+
+package PlanProto;
+
+
+message CellUpdate {
+  string sheet_id = 1;
+  string channel = 2;
+
+  int32 rv = 6;
+  int32 cv = 7;
+  int32 spill_to_rv = 13;
+  int32 spill_to_cv = 14;
+
+  repeated string labels = 8;
+  string code = 9;
+  bytes value = 10;
+  bool is_literal = 18;
+  string metadata = 17;  
+  VType vtype = 11; // value type
+  map<string, string> style = 12; // CSS
+  map<string, string> property = 16; // others
+}
+
+
+message NodeConfigUpdate {
+  string node_id = 1;
+  string name = 2;
+  string code = 3;
+  Table value = 4;
+}
+
+
+message NodeStatusUpdate {
+  string node_id = 1;
+  string name = 2;
+  Table value = 3;
+}
+
+
+message BarrierUpdate {
+  string sheet_id = 1;
+  Orientation orientation = 2;
+  int32 vpos = 3;
+
+  bool on = 4;
+  int32 size = 5; // number of elastic rows/cols
+}
+
+
+message PropertyDefUpdate {
+  string sheet_id = 1;
+  string property_id = 2;
+  int32 priority = 3;
+  string from = 4;
+  string to = 5;
+  string property_code = 6;
+  // and the actual evaluated value
+  int32 from_rv = 10;
+  int32 from_cv = 11;
+  int32 to_rv = 12;
+  int32 to_cv = 13;
+  Table property_value = 14;
+}
+
+
+message TwitPropertyDefUpdate {
+  string sheet_id = 1;
+  string twit_property_id = 2;
+  int32 priority = 3;
+  repeated string tags = 4;
+  TwitPropertyVerb verb = 5;
+  string region = 6;
+  string property_code = 7;
+  // and the actual evaluated value
+  int32 from_rv = 10;
+  int32 from_cv = 11;
+  int32 to_rv = 12;
+  int32 to_cv = 13;
+  map<string, Table> property_value = 14;
+}
+
+
+message TwitUpdate {
+  string sheet_id = 1;
+  string channel = 13;
+  string twit_id = 2; // unique within a sheet_id
+
+  bool valid = 3;
+  string parent_id = 4; // parent's twit_id
+
+  string tag = 5;
+  int32 from_rv = 6;
+  int32 to_rv = 7;
+  int32 from_cv = 8;
+  int32 to_cv = 9;
+
+  repeated int32 widths = 10 [packed=false];
+  repeated int32 heights = 11 [packed=false];
+
+  map<string, string> props = 15;
+}
+
+
+message NodeUpdate {
+  string node_id = 1;
+  string parent_id = 2;
+  string name = 3;
+  NodeType type = 4;
+  repeated string configs = 6;
+  repeated string statuses = 7;
+  repeated string child_ids = 5;
+}
+
+
+message DocOptionUpdate {
+  string name = 1;
+  string value = 2;
+}
+
+
+message Redirect {
+  string node_id = 1;
+  string redirect_to = 2;
+  Error redirect_error = 3; // to report e.g. redirect loops
+}

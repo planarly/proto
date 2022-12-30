@@ -1,0 +1,329 @@
+syntax = "proto3";
+
+import "common.proto";
+
+package PlanProto;
+
+
+message RowColLinkKey {
+  string sheet = 1;
+  uint64 sl = 2;
+  bool prev_not_next = 3;
+  bool row_not_col = 4;
+}
+
+
+message RowColLinkValue {
+  uint64 sl = 1;
+}
+
+
+message LabelPosKey {
+  string sheet = 1;
+  bytes label_sha1 = 2; // binary representation; size == 20 bytes
+}
+
+
+message LabelPosValue {
+  string label = 1;
+  // row/col will be translated. If already translated, set both to -1
+  int64 row = 2;
+  int64 col = 3;
+  // .. into rsl & csl
+  uint64 rsl = 4;
+  uint64 csl = 5;
+}
+
+
+// -> SetCellCode action using firm positions
+// removed after translation to CellCodeKeySl
+message CellCodeKey {
+  string sheet = 1;
+  int64 rf = 2;
+  int64 cf = 3;
+}
+
+
+// actually store cell codes in skiplist coordinates
+message CellCodeKeySl {
+  string sheet = 1;
+  int64 rsl = 2;
+  int64 csl = 3;
+}
+
+
+message CellCodeValue {
+  string code = 1;
+  bytes literal_value = 3;
+  VType literal_vtype = 4;
+  string literal_metadata = 5;
+  bool hidden = 2;
+  // if set, all cells covered by this formula will have a property visibility:hidden
+
+}
+
+
+// -> SetBarrierKey action using firm positions
+// removed after translation to BarrierKey
+message HBarrierKey {
+  string sheet = 1;
+  int64 row = 2;
+}
+
+
+message HBarrierValue {
+  bool on = 1;
+}
+
+
+// -> SetBarrierKey using firm positions
+// removed after translation to BarrierKey
+message VBarrierKey {
+  string sheet = 1;
+  int64 col = 2;
+}
+
+
+message VBarrierValue {
+  bool on = 1;
+}
+
+
+// actually store barriers in skiplist coordinates
+message BarrierKey {
+  string sheet = 1;
+  bool row_not_col = 2;
+  uint64 sl = 3;
+}
+
+
+message BarrierValue {
+  bool on = 1;
+}
+
+
+message DocOptionKey {
+  bytes name_sha1 = 1; // binary representation; size == 20 bytes
+}
+
+
+message DocOptionValue {
+  string name = 1;
+  string value = 2;
+}
+
+
+message GlobalVarKey {
+  string name = 1;
+}
+
+
+message GlobalVarValue {
+  Table value = 1;
+}
+
+
+message NodeConfigKey {
+  string node = 1;
+  string name = 2;
+}
+
+
+message NodeConfigValue {
+  string code = 1;
+}
+
+
+message PropertyDefKey {
+  string sheet = 1;
+  string property = 2;
+}
+
+
+message PropertyDefValue {
+  string sheet = 1;
+  string property = 2;
+  int64 priority = 3;
+  string topleft = 4;
+  string bottomright = 5;
+  string scode = 6;
+}
+
+
+message TwitPropertyDefKey {
+  string sheet = 1;
+  string twit_property = 2;
+}
+
+
+message TwitPropertyDefValue {
+  string sheet = 1;
+  string twit_property = 2;
+  int64 priority = 3;
+  repeated string tags = 4;
+  TwitPropertyVerb verb = 5;
+  string region = 6;
+  string property_code = 7;
+}
+
+
+message OverlayDefKey {
+  string overlay = 1;
+}
+
+
+message OverlayDefSub {
+  string node = 1; // '' for global var
+  string name = 2;
+  Table value = 3;
+}
+
+
+message OverlayDefInput {
+  string sheet = 1;
+  uint64 rsl = 2;
+  int64 re = 3;
+  uint64 csl = 4;
+  int64 ce = 5;
+  string value = 6;
+  VType vtype = 7;
+  string metadata = 8;
+}
+
+
+message OverlayDefValue {
+  bool exists = 1;
+  bool is_const = 2;
+  string error_key = 3;
+
+  repeated OverlayDefSub label_subs = 5;
+  repeated OverlayDefSub node_config_subs = 6;
+  repeated OverlayDefSub global_var_subs = 7;
+  repeated OverlayDefInput inputs = 8;
+  repeated string node_subscriptions = 9;
+}
+
+
+message VaultedOverlayDefKey {
+  string overlay = 1;
+}
+
+
+message OverlayHashLookupKey {
+  int64 hash = 1;
+}
+
+
+message OverlayHashLookupEntry { 
+  string overlay = 1;
+  OverlayDefValue def = 2;
+}
+
+
+message OverlayHashLookupValue {
+  repeated OverlayHashLookupEntry entry = 3;
+}
+
+
+message NodeTypeKey {
+  string node = 1;
+}
+
+
+message NodeTypeValue {
+  NodeType type = 1;
+}
+
+
+message NodeParentKey {
+  string node = 1;
+}
+
+
+message NodeParentValue {
+  string name = 1;
+  string parent = 2;
+}
+
+
+message NodeStatusKey {
+  string node = 1;
+  string name = 2;
+}
+
+
+message OverlaidTable {
+  string overlay = 1;
+  Table value = 2;
+}
+
+
+message NodeStatusValue {
+  Table value_v = 1;
+  repeated OverlaidTable value_overlaid = 2;
+}
+
+
+// must add corresponding lines in:
+// - sss/iku/axiom/convert.cpp Proto2IkuKey
+// - sss/iku/axiom/foreach_axiom_key.snippet
+
+message AxiomKey {
+  oneof key {
+    RowColLinkKey rc_link = 16;
+    LabelPosKey label_pos = 1;
+    CellCodeKey cell_code = 2;
+    CellCodeKeySl cell_code_sl =17;
+    HBarrierKey hbarrier = 3;
+    VBarrierKey vbarrier = 4;
+    BarrierKey barrier = 18;
+    DocOptionKey doc_option = 5;
+    GlobalVarKey global_var = 6;
+    NodeConfigKey node_config = 7;
+    PropertyDefKey property_def = 9;
+    TwitPropertyDefKey twit_property_def = 19;
+    OverlayDefKey overlay_def = 10;
+    VaultedOverlayDefKey vaulted_overlay_def = 15;
+    OverlayHashLookupKey overlay_hash_lookup = 14;
+    NodeTypeKey node_type = 11;
+    NodeParentKey node_parent = 12;
+    NodeStatusKey node_status = 13;
+  }
+}
+
+// must add corresponding lines in:
+// - sss/iku/axiom/convert.cpp Proto2IkuValue
+// - sss/iku/axiom/foreach_axiom_key.snippet
+
+message AxiomValue {
+  oneof value {
+    RowColLinkValue rc_link = 16;
+    LabelPosValue label_pos = 1;
+    CellCodeValue cell_code = 2;
+    HBarrierValue hbarrier = 3;
+    VBarrierValue vbarrier = 4;
+    BarrierValue barrier = 18;
+    DocOptionValue doc_option = 5;
+    GlobalVarValue global_var = 6;
+    NodeConfigValue node_config = 7;
+    PropertyDefValue property_def = 9;
+    TwitPropertyDefValue twit_property_def = 19;
+    OverlayDefValue overlay_def = 10;
+    OverlayHashLookupValue overlay_hash_lookup = 14;
+    NodeTypeValue node_type = 11;
+    NodeParentValue node_parent = 12;
+    NodeStatusValue node_status = 13;
+  }
+}
+
+
+message AxiomKeyValue {
+  AxiomKey key = 1;
+  AxiomValue value = 2;
+}
+
+
+message AxiomDump {
+  string format = 1;
+  repeated AxiomKeyValue kv = 3;
+}

@@ -1,0 +1,164 @@
+syntax = "proto3";
+
+package PlanProto;
+
+
+enum Orientation {
+  ROW = 0;
+  COL = 1;
+}
+
+// type of value (code in the cell)
+enum VType {
+  BLANK = 0;
+  ERROR = 1;
+  BOOL = 2;
+  INT = 3;
+  DOUBLE = 4;
+  STRING = 5;
+  BDATA = 6;
+  REF = 7; // ref to region
+  NODE = 8;
+  INVALID_SHEET = 20; // cell does not exist
+}
+
+
+
+enum NodeType {
+    INVALID = 0;
+    ROOT = 1;
+    SHEET = 2;
+    MACRO = 3;
+    SVG = 4;
+    APEX_CHARTS = 5;
+    INJA_WEBPAGE = 6;
+}
+
+
+message TableCell {
+  int32 row = 1;
+  int32 col = 2;
+  string value = 3;
+  VType vtype = 4;
+  string metadata = 5; // meaning depends on vtype; for err_t it's the error key
+}
+
+
+enum TableExpansion {
+  NO_EXPANSION = 0;
+  INFLATE = 1; // fill with blank
+  EXTEND = 2; // fill with last border cells
+  TILE = 3; // repeat table
+};
+
+
+message Table {
+  int32 rows = 1;
+  int32 cols = 2;
+  repeated TableCell cells = 3;
+
+  bool ignore_hbarriers = 4;
+  bool ignore_vbarriers = 5;
+  TableExpansion expansion = 6;
+}
+
+
+message NamedSubstitution {
+  string node_id = 1;
+  string name = 2;
+  Table value = 3;
+}
+
+
+message QueryParameter {
+  repeated NamedSubstitution substs = 1;
+}
+
+
+enum ErrorCode {
+  OK = 0;
+
+  // up to 999: HTTP error codes
+
+  ERROR_HTTP_FORBIDDEN = 403;
+  ERROR_HTTP_NOT_FOUND = 404;
+  ERROR_HTTP_INTERNAL_SERVER = 500;
+
+  ERROR_SYNTAX = 1000;
+  ERROR_GENERIC = 1001;
+  ERROR_TERMINATED = 1002;
+  ERROR_BAD_CHANNEL = 1003;
+  ERROR_CHANNEL_NOT_IN_PAGE_VIEW = 1004;
+  ERROR_REDIRECT_LOOP = 1005;
+
+  ERROR_IKU = 2000;
+  ERROR_IKU_EVAL_LOOP = 2001;
+  ERROR_IKU_SPILL_CONFLICT = 2002;
+  ERROR_IKU_EXTRA_SPILL = 2003;
+  ERROR_IKU_SKIPLIST_NOT_READY = 2004;
+
+  ERROR_EVAL = 3000;
+  ERROR_EVAL_UNKNOWN_OPERATOR = 3001;
+  ERROR_EVAL_BAD_TYPE = 3002;
+  ERROR_EVAL_STACK = 3003;
+  ERROR_EVAL_NOT_IMPLEMENTED = 3004;
+  ERROR_EVAL_UNKNOWN_NODE_UUID = 3005;
+  ERROR_EVAL_BAD_RANGE = 3006;
+  ERROR_EVAL_UNKNOWN_IDENTIFIER = 3007;
+  ERROR_EVAL_SESSION_NOT_READY = 3008;
+  ERROR_EVAL_BAD_SESSION = 3009;
+  ERROR_EVAL_BAD_NODE_VAR = 3010;
+  ERROR_EVAL_MISMATCHING_DIMENSIONS = 3011;
+  ERROR_EVAL_DIVIDE_BY_ZERO = 3012;
+  ERROR_EVAL_VALUE_NOT_READY = 3013;
+  ERROR_EVAL_HAS_SESSION = 3014;
+  ERROR_EVAL_SINGLE_ROWCOL_ONLY = 3015;
+  ERROR_EVAL_BAD_INDEX = 3016;
+  ERROR_EVAL_BAD_VALUE = 3017;
+  ERROR_EVAL_USER_ERROR = 3018;
+  ERROR_EVAL_WRONG_NUMBER_ARGS = 3019;
+  ERROR_EVAL_BAD_NAME = 3020;
+  ERROR_EVAL_NO_PARENT = 3021;
+  ERROR_EVAL_NO_ME = 3022;
+  ERROR_EVAL_WILL_NOT_HALT = 3023;
+  ERROR_EVAL_NOT_IN_TABLE_COMPREHENSION = 3024;
+  ERROR_EVAL_UNEVALED_IN_TABLE_COMPREHENSION = 3027;
+  ERROR_EVAL_MOVE_BACK_IN_TABLE_COMPREHENSION = 3028;
+  ERROR_EVAL_NOT_CELL = 3025;
+  ERROR_EVAL_OUT_OF_RANGE = 3026;
+
+  ERROR_FFI = 4000;
+  ERROR_FFI_CONFIG = 4001;
+  ERROR_FFI_SQLITE3 = 4002;
+
+  ERROR_DOC = 5000;
+  ERROR_DOC_UNKNOWN_NODE_UUID = 5001;
+  ERROR_DOC_BAD_STATUS_NAME = 5002;
+  ERROR_DOC_PERMISSION = 5003;
+
+  ERROR_MACRO = 6000;
+  ERROR_MACRO_BAD_UUID = 6001;
+  ERROR_MACRO_NOT_INPUT = 6002;
+
+  ERROR_TODO = 9000;
+  ERROR_INTERNAL = 9001;
+  ERROR_BAD_PARAMETER = 9002;
+  ERROR_BAD_XML = 9003;
+  ERROR_BAD_JSON = 9004;
+}
+
+
+message Error {
+  ErrorCode code = 1;
+  string key = 3; // the original key that caused the error
+  string message = 2;
+}
+
+
+enum TwitPropertyVerb
+{
+  CREATE_AT = 0;
+  INTERSECTS = 1;
+  // INSIDE?
+  // COVERS?
+}

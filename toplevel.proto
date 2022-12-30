@@ -1,0 +1,126 @@
+syntax = "proto3";
+
+import "command.proto";
+import "cloud.proto";
+import "query.proto";
+import "update.proto";
+import "common.proto";
+import "subscription.proto";
+
+package PlanProto;
+
+message Up {
+  string channel_id = 1;
+  string request_id = 2; // only required for Req* payload, otherwise ignored
+
+  oneof payload {
+    InsertRowsCols insert_rows_cols = 25;
+    RemoveRowsCols remove_rows_cols = 26;
+    AddLabels add_labels = 10;
+    SetLabels set_labels = 23;
+    DelLabel del_label = 11;
+    SetCode set_code = 12;
+    SetCodes set_codes = 27;
+    AddProperty add_property = 13;
+    SetProperty set_property = 20;
+    SetProperties set_properties = 29;
+    MoveProperty move_property = 21;
+    SetTwitProperty set_twit_property = 40;
+    MoveTwitProperty move_twit_property = 41;
+    SetLabelsCode set_labels_code = 14;
+    SetBarrier set_barrier = 15;
+    SetNodeConfig set_node_config = 16;
+    SetNodeConfigs set_node_configs = 28;
+    SetNodeStatus set_node_status = 24;
+    SetVarInOverlay set_var_in_overlay = 17;
+    SetGlobalVar set_global_var = 18;
+    SetGlobalVarInOverlay set_global_var_in_overlay = 19;
+    SetDocOption set_doc_option = 22;
+
+    SetFeCode set_fe_code = 100;
+    SetFeLabelCode set_fe_label_code = 101;
+    SetFeHBarrier set_fe_hbarrier = 102;
+    SetFeVBarrier set_fe_vbarrier = 103;
+
+    SetInput set_input = 96;
+    SetLabelValueInOverlay set_label_value_in_overlay = 90;
+    SetNodeConfigInOverlay set_node_config_in_overlay = 91;
+
+    LoadDoc load_doc = 30;
+    AddSheet add_sheet = 31;
+    AddNode add_node = 34;
+    MoveNode move_node = 32;
+    RemoveNode remove_node = 33;
+
+    ReqVersion req_version = 80;
+    ReqDocStr req_doc_str = 50;
+    ReqDocwide req_docwide = 81;
+    ReqTree req_tree = 52;
+    ReqNode req_node = 53;
+    ReqHtmlRender req_html_render = 54;
+    ReqValidateCode req_validate_code = 56;
+    ReqFullTextSearch req_full_text_search = 57;
+    ReqStateDump req_state_dump = 61;
+
+    RunMacro run_macro = 55;
+    InvokeEvent invoke_event = 58;
+
+    LoginCloud login_cloud = 70;
+    ReqFileCloud load_cloud = 71;
+    SaveCloud save_cloud = 72;
+    ListCloud list_cloud = 73;
+    DeleteCloud delete_cloud = 74;
+    UserCloud user_cloud = 75;
+    ReqPublicLink req_public_link = 76;
+
+    // useful for the middleware. In wasm, the add_channel() 
+    // call automatically creates the channel
+    AddChannel add_channel = 113;
+    Subscribe subscribe = 110;
+    CloseChannel close_channel = 111;
+    UnloadDoc unload_doc = 112;
+    KeepAlive keep_alive = 114;
+  }
+};
+
+
+message DownPayload {
+  oneof payload {
+    Error error = 5;
+
+    CellUpdate cell_update = 10;
+    NodeConfigUpdate node_config_update = 14;
+    NodeStatusUpdate node_status_update = 16;
+    BarrierUpdate barrier_update = 11;
+    NodeUpdate node_update = 12;
+    PropertyDefUpdate property_def_update = 13;
+    TwitPropertyDefUpdate twit_property_def_update = 40;
+    TwitUpdate twit_update = 17;
+    DocOptionUpdate doc_option_update = 15;
+
+    ResVersion res_version = 80;
+    ResDocStr res_doc_str = 50;
+    ResDocwide res_docwide = 81;
+    ResTree res_tree = 52;
+    ResNode res_node = 53;
+    ResHtmlRender res_html_render = 54;
+    ResFullTextSearch res_full_text_search = 55;
+    ResStateDump res_state_dump = 61;
+
+    ResSaveCloud res_save_cloud = 56;
+    ResListCloud res_list_cloud = 57;
+    ResDeleteCloud res_delete_cloud = 58;
+    ResUserCloud res_user_cloud = 59;
+    ResPublicLink res_public_link = 60;
+
+    SubscriptionSnapshot subscription_snapshot = 110;
+    Redirect redirect = 115;
+  }
+}
+
+
+message Down {
+  repeated string channel_id = 1;
+  string request_id = 3; // only set for Rsp* payload, otherwise empty
+  repeated DownPayload payload = 4;
+};
